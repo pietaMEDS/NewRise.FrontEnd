@@ -1,0 +1,7 @@
+* {
+  transition: all 0.5 fade;
+}
+
+body {
+  min-height: 100vh;
+}

@@ -1,0 +1,9 @@
+.backimage {
+  width: 100%;
+  height: 450px;
+  background-image: url('../assets/backimage.png');
+}
+
+main {
+  min-height: 100vh;
+}
