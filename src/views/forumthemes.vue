@@ -35,13 +35,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { useDevStore } from '@/stores/dev'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const loaded = ref(false)
 const themes = ref([])
 const isAdmin = ref(false) // TODO: Implement admin check from auth store
+const refreshInterval = ref(null)
 
 const formatDate = (date) => {
   return new Date(date).toLocaleString('ru-RU', {
@@ -49,7 +51,7 @@ const formatDate = (date) => {
     month: '2-digit',
     year: '2-digit',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 
@@ -64,7 +66,7 @@ const showCreateThemeModal = () => {
 
 const fetchThemes = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/themes')
+    const response = await fetch(useDevStore().host + '/themes')
     const data = await response.json()
     themes.value = data.data
     loaded.value = true
@@ -76,8 +78,8 @@ const fetchThemes = async () => {
         name: 'Не удалось загрузить темы',
         desc: 'Произошла ошибка при загрузке тем. Пожалуйста, попробуйте позже.',
         postsCount: '-',
-        created_at: new Date()
-      }
+        created_at: new Date(),
+      },
     ]
     loaded.value = true
   }
@@ -90,12 +92,18 @@ onMounted(async () => {
       name: 'Загрузка...',
       desc: 'Загрузка...',
       postsCount: '-',
-      created_at: new Date()
-    }
+      created_at: new Date(),
+    },
   ]
 
   await fetchThemes()
-  setInterval(fetchThemes, 30000) // Refresh every 30 seconds
+  refreshInterval.value = setInterval(fetchThemes, 30000) // Refresh every 30 seconds
+})
+
+onUnmounted(() => {
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value)
+  }
 })
 </script>
 

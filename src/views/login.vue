@@ -28,7 +28,6 @@
         />
         <small class="form-text text-muted">{{ passwordErr }}</small>
       </div>
-
       <button type="submit" class="btn btn-primary" :disabled="isLoading">
         {{ isLoading ? 'Загрузка...' : 'Войти' }}
       </button>
@@ -40,6 +39,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useDevStore } from '@/stores/dev'
 
 export default {
   name: 'Login',
@@ -49,6 +49,7 @@ export default {
     const emailErr = ref('')
     const passwordErr = ref('')
     const isLoading = ref(false)
+    const mainerr = ref('')
 
     const router = useRouter()
     const authStore = useAuthStore()
@@ -77,49 +78,28 @@ export default {
 
       isLoading.value = true
       try {
-        const baseUrl = 'http://localhost:8000'
-
-        // // Get CSRF cookie
-        // const csrfResponse = await fetch(`${baseUrl}/sanctum/csrf-cookie`, {
-        //   credentials: 'include',
-        // })
-
-        // // Get CSRF token from cookie
-        // const csrfToken = document.cookie
-        //   .split('; ')
-        //   .find((row) => row.startsWith('XSRF-TOKEN='))
-        //   ?.split('=')[1]
-
-        // if (!csrfToken) {
-        //   throw new Error('CSRF token not found')
-        // }
-
-        const response = await fetch(`${baseUrl}/api/users/login`, {
+        const response = await fetch(`${useDevStore().host}/users/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
-            // 'X-XSRF-TOKEN': decodeURIComponent(csrfToken),
           },
           body: JSON.stringify({
             email: email.value,
             password: password.value,
           }),
-          // credentials: 'include',
         })
 
-        if (!response.ok) {
+        if (response.status == 401) {
           const error = await response.json()
-          if (error.errors) {
-            emailErr.value = error.errors.email || ''
-            passwordErr.value = error.errors.password || ''
-          }
+          passwordErr.value = 'Неверные данные'
         } else {
           const data = await response.json()
           authStore.setToken(data.token, data.user.id)
           router.push('/forum')
         }
       } catch (error) {
+        mainerr.value.err = 'Произошла ошибка попробуйте в следующий раз'
         console.error('Login error:', error)
       } finally {
         isLoading.value = false

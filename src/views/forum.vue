@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useDevStore } from '@/stores/dev'
 
 const route = useRoute()
 const router = useRouter()
@@ -11,6 +12,7 @@ const isLoading = ref(true)
 const error = ref(null)
 const refreshInterval = ref(null)
 const showCreateModal = ref(false)
+const isAdmin = ref(false)
 const newCategory = ref({
   name: '',
   description: '',
@@ -18,9 +20,29 @@ const newCategory = ref({
   isPrivate: false,
 })
 
+const adminCheck = async () => {
+  try {
+    const response = await fetch(useDevStore().host + '/admin/check', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+      },
+    })
+    const data = await response.json()
+    console.log(data.status)
+
+    if (data.status === '200') {
+      isAdmin.value = true
+    } else {
+    }
+  } catch (error) {
+    console.error('Ошибка при проверке администратора:', error)
+  }
+}
+
 const fetchCategories = async () => {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/forums/${route.params.id}`, {
+    const response = await fetch(`${useDevStore().host}/forums/${route.params.id}`, {
       timeout: 5000,
       headers: {
         Authorization: `Bearer ${authStore.token}`,
@@ -54,7 +76,7 @@ const fetchCategories = async () => {
 
 const createNewCategory = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/forums/create', {
+    const response = await fetch(useDevStore().host + '/forums/create', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,6 +104,7 @@ const createNewCategory = async () => {
 onMounted(async () => {
   await fetchCategories()
   await CheckPrivate(route.params.id)
+  adminCheck()
   refreshInterval.value = setInterval(fetchCategories, 30000)
 })
 
@@ -94,7 +117,7 @@ onUnmounted(() => {
 const privateForum = ref(false)
 
 const CheckPrivate = async (id) => {
-  const response = await fetch(`http://127.0.0.1:8000/api/themes/${id}`)
+  const response = await fetch(`${useDevStore().host}/themes/${id}`)
   const data = await response.json()
   if (data.data.status == 'private') {
     privateForum.value = false
@@ -108,8 +131,12 @@ const CheckPrivate = async (id) => {
   <div class="container">
     <div class="header-section mb-4 d-flex justify-content-between align-items-center">
       <h1>Форум New Rise</h1>
-      <button v-if="privateForum" class="btn btn-primary" @click="showCreateModal = true">
-        <i class="fas fa-plus"></i> Создать тему
+      <button
+        v-if="privateForum || isAdmin"
+        class="btn btn-primary"
+        @click="showCreateModal = true"
+      >
+        <i class="fas fa-plus">Создать тему</i>
       </button>
     </div>
 

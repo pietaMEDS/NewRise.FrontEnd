@@ -1,7 +1,22 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { useContextAditionsActionsStore } from '@/stores/contextFunctions'
+import { onMounted, onUnmounted, ref } from 'vue'
+import * as bootstrap from 'bootstrap'
 
 const carousel = ref(null)
+
+const contextActionsStore = useContextAditionsActionsStore()
+
+const pageActions = [
+  {
+    name: 'Additional function',
+    action: async function () {
+      console.log('Ha Ha Easy')
+    },
+  },
+]
+
+contextActionsStore.setAction(pageActions)
 
 onMounted(() => {
   // Initialize Bootstrap carousel with enhanced options
@@ -12,9 +27,13 @@ onMounted(() => {
       wrap: true,
       pause: 'hover',
       keyboard: true,
-      touch: true
+      touch: true,
     })
   }
+})
+
+onUnmounted(() => {
+  contextActionsStore.setAction(null)
 })
 </script>
 
@@ -26,15 +45,16 @@ onMounted(() => {
         <div class="col-lg-8 text-center">
           <h1 class="display-4 mb-4 text-shadow"><strong>New Rise</strong></h1>
           <p class="lead text-shadow">
-            Ролевой сервер на базе игры Garry's Mod, посвящённый периоду Войн Клонов вселенной Star Wars
+            Ролевой сервер на базе игры Garry's Mod, посвящённый периоду Войн Клонов вселенной Star
+            Wars
           </p>
 
           <h2 class="title mt-5 mb-4 text-shadow">Твой любимый классический CWRP</h2>
 
           <p class="mb-4 text-shadow">
-            Примерь на себя образ солдата-клона Великой Армии Республики. Прими участие в сражениях с
-            дроидами Конфедерации бок о бок с культовыми персонажами саги или создай свою оригинальную
-            историю совместно с мастерами игровых событий.
+            Примерь на себя образ солдата-клона Великой Армии Республики. Прими участие в сражениях
+            с дроидами Конфедерации бок о бок с культовыми персонажами саги или создай свою
+            оригинальную историю совместно с мастерами игровых событий.
           </p>
           <p class="h4 mb-5 text-shadow">На New Rise рождаются новые истории!</p>
         </div>
@@ -73,11 +93,21 @@ onMounted(() => {
         </div>
       </div>
 
-      <button class="carousel-control-prev" type="button" data-bs-target="#carouselMain" data-bs-slide="prev">
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#carouselMain"
+        data-bs-slide="prev"
+      >
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Previous</span>
       </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#carouselMain" data-bs-slide="next">
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#carouselMain"
+        data-bs-slide="next"
+      >
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
       </button>

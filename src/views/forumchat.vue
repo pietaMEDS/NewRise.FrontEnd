@@ -5,52 +5,78 @@
     </div>
 
     <div v-else>
-
       <div class="posts">
-        <div v-for="post in posts" :key="post.id" class="post">
-          <div class="post-sidebar">
-            <img
-              v-if="post.creator.avatar"
-              :src="post.creator.avatar.path"
-              :alt="post.creator.login"
-              class="avatar"
-            />
-            <img v-else src="@/assets/users/default.png" alt="default" class="avatar" />
-            <div class="author-name">{{ post.creator.name }}</div>
-          </div>
-          <div class="post-main">
-            <div class="post-header">
-              <span class="date">{{ formatDate(post.created_at) }}</span>
-              <span v-if="post.created_at !== post.updated_at" class="post-updated"
-                >Изменено ({{ formatDate(post.updated_at) }})</span
+        <template v-for="post in posts">
+          <div
+            v-if="post.status != 'deleted'"
+            @contextmenu="setDoubleContext(post)"
+            class="post"
+            :id="`postID_` + post.id"
+          >
+            <div class="post-sidebar">
+              <img
+                v-if="post.creator.avatar"
+                :src="post.creator.avatar.path"
+                :alt="post.creator.login"
+                class="avatar"
+              />
+              <img v-else src="@/assets/users/default.png" alt="default" class="avatar" />
+              <div class="author-name">{{ post.creator.name }}</div>
+            </div>
+            <div class="post-main">
+              <div class="post-header">
+                <span class="date">{{ formatDate(post.created_at) }}</span>
+                <span v-if="post.created_at !== post.updated_at" class="post-updated"
+                  >Изменено ({{ formatDate(post.updated_at) }})</span
+                >
+                <div class="post-actions">
+                  <button class="action-btn reply" @click="replyToPost(post)">Ответить</button>
+                  <button
+                    v-if="post.creator.id === currentUserId || userVerified"
+                    class="action-btn edit"
+                    @click="editPost(post)"
+                  >
+                    Изменить
+                  </button>
+                  <button
+                    v-if="post.creator.id === currentUserId || userVerified"
+                    class="action-btn delete"
+                    @click="deletePost(post.id)"
+                  >
+                    Удалить
+                  </button>
+                </div>
+              </div>
+              <div v-if="post.reaction" class="reaction-preview">
+                <a
+                  v-if="post.reaction.status == 'deleted'"
+                  :href="`#postID_` + post.reaction.id"
+                  class="reaction-content"
+                >
+                  <span class="reaction-author">@{{ post.reaction.creator.name }}</span
+                  >:
+                  <span class="reaction-text">Сообщение было удалено.</span>
+                </a>
+                <a v-else :href="`#postID_` + post.reaction.id" class="reaction-content">
+                  <span class="reaction-author">@{{ post.reaction.creator.name }}</span
+                  >:
+                  <span class="reaction-text">{{
+                    post.reaction.text.length > 20
+                      ? post.reaction.text.slice(0, 20) + '...'
+                      : post.reaction.text
+                  }}</span>
+                </a>
+              </div>
+              <div
+                class="post-content"
+                v-for="(postText, postTextIndex) in post.text.split(`\n`)"
+                :key="postTextIndex"
               >
-              <div class="post-actions">
-                <button class="action-btn reply" @click="replyToPost(post)">Ответить</button>
-                <button
-                  v-if="post.creator.id === currentUserId"
-                  class="action-btn edit"
-                  @click="editPost(post)"
-                >
-                  Изменить
-                </button>
-                <button
-                  v-if="post.creator.id === currentUserId"
-                  class="action-btn delete"
-                  @click="deletePost(post.id)"
-                >
-                  Удалить
-                </button>
+                <p>{{ postText }}</p>
               </div>
             </div>
-            <div v-if="post.reaction" class="reaction-preview">
-              <div class="reaction-content">
-                <span class="reaction-author">@{{ post.reaction.creator.name }}</span>:
-                <span class="reaction-text">{{ post.reaction.text.length > 20 ? post.reaction.text.slice(0, 20) + '...' : post.reaction.text }}</span>
-              </div>
-            </div>
-            <div class="post-content">{{ post.text }}</div>
           </div>
-        </div>
+        </template>
       </div>
 
       <div class="new-post">
@@ -91,9 +117,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import router from '@/router'
+import { useContextAditionsActionsStore } from '@/stores/contextFunctions'
+import Pusher from 'pusher-js'
+import { useDevStore } from '@/stores/dev'
 
 const authStore = useAuthStore()
 const route = useRoute()
@@ -104,6 +134,60 @@ const currentUserId = authStore.user_id
 const showModal = ref(false)
 const EditPost = ref('')
 const ReplyPost = ref('')
+const userVerified = ref(false)
+const messageActions = ref()
+const contextActionsStore = useContextAditionsActionsStore()
+const socket = ref(null)
+const channel = ref(null)
+
+const connectChatSocket = () => {
+  // Initialize Pusher with your app key
+  socket.value = new Pusher('c99fad2f51f6408f6964', {
+    cluster: 'eu',
+    encrypted: true,
+  })
+
+  // Create channel for this forum
+  channel.value = socket.value.subscribe(`forum-chat-${route.params.id}`)
+
+  // Bind to new post events
+  channel.value.bind('new-post', (data) => {
+    posts.value.push(data.post)
+  })
+
+  // Bind to updated post events
+  channel.value.bind('updated-post', (data) => {
+    console.log('Updated post received:', data)
+    const index = posts.value.findIndex((post) => {
+      post.id === data.post.id
+    })
+
+    if (index !== -1) {
+      posts.value[index] = data.post
+    }
+  })
+  // Bind to post delete events
+  channel.value.bind('delete-post', (data) => {
+    console.log('Post delete received:', data)
+    const index = posts.value.findIndex((post) => post.id === data.post.id)
+    if (index !== -1) {
+      posts.value[index].text = `{ Сообщение удалено }`
+    }
+  })
+
+  // Handle connection states
+  socket.value.connection.bind('connected', () => {
+    console.log('Connected to Pusher')
+  })
+
+  socket.value.connection.bind('disconnected', () => {
+    console.log('Disconnected from Pusher')
+  })
+
+  socket.value.connection.bind('error', (error) => {
+    console.error('Pusher connection error:', error)
+  })
+}
 
 const formatDate = (date) => {
   return new Date(date).toLocaleString('ru-RU', {
@@ -113,6 +197,74 @@ const formatDate = (date) => {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+const setDoubleContext = (post) => {
+  if (post.creator.id === currentUserId || userVerified) {
+    messageActions.value = [
+      {
+        name: 'Ответить...',
+        action: async function () {
+          replyToPost(post)
+        },
+      },
+      {
+        name: 'Удалить сообщение',
+        action: async function () {
+          deletePost(post.id)
+        },
+      },
+      {
+        name: 'Изменить сообщение',
+        action: async function () {
+          editPost(post)
+        },
+      },
+      {
+        name: 'Перейти в профиль',
+        action: async function () {
+          router.push('/profile/' + post.creator.id)
+        },
+      },
+    ]
+  } else {
+    messageActions.value = [
+      {
+        name: 'Ответить...',
+        action: async function () {
+          replyToPost(post)
+        },
+      },
+      {
+        name: 'Перейти в профиль',
+        action: async function () {
+          router.push('/profile/' + post.creator.id)
+        },
+      },
+    ]
+  }
+
+  contextActionsStore.setDoubleAction(messageActions)
+}
+
+const adminCheck = async () => {
+  try {
+    const response = await fetch(useDevStore().host + '/admin/check', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+      },
+    })
+    const data = await response.json()
+    console.log(data.status)
+
+    if (data.status === '200') {
+      userVerified.value = true
+    } else {
+    }
+  } catch (error) {
+    console.error('Ошибка при проверке администратора:', error)
+  }
 }
 
 const createPost = async () => {
@@ -131,7 +283,7 @@ const createPost = async () => {
       createdAt: new Date(),
     }
 
-    const response = await fetch('http://127.0.0.1:8000/api/messages', {
+    const response = await fetch(useDevStore().host + '/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -143,10 +295,8 @@ const createPost = async () => {
     if (!response.ok) {
       throw new Error('Ошибка при отправке поста')
     }
-
-    const data = await response.json()
-    posts.value.push(data) // Assuming the API returns the created post
     newPost.value = ''
+    ReplyPost.value = ''
   } catch (error) {
     console.error('Ошибка при создании поста:', error)
   }
@@ -158,7 +308,7 @@ const fetchPosts = async () => {
       clearInterval(intervalId.value)
       return
     }
-    const response = await fetch(`http://127.0.0.1:8000/api/messages/${route.params.id}`)
+    const response = await fetch(`${useDevStore().host}/messages/${route.params.id}`)
     const data = await response.json()
     posts.value = data.data
     loaded.value = true
@@ -176,7 +326,7 @@ const editPost = (post) => {
 
 const deletePost = async (postId) => {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/messages/${postId}`, {
+    const response = await fetch(`${useDevStore().host}/messages/${postId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${authStore.token}`,
@@ -201,7 +351,7 @@ const closeModal = () => {
 const updatePost = async () => {
   // if (!newPost.value.trim()) return;
 
-  const response = await fetch(`http://127.0.0.1:8000/api/messages/${EditPost.value.id}/edit`, {
+  const response = await fetch(`${useDevStore().host}/messages/${EditPost.value.id}/edit`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -224,12 +374,12 @@ const updatePost = async () => {
 
 const replyToPost = (post) => {
   ReplyPost.value = post
-  newPost.message_id = post.id // Добавляем имя автора поста в новое сообщение
+  newPost.value.message_id = post.id // Добавляем имя автора поста в новое сообщение
   // Здесь можно добавить логику для отображения текста сообщения над полем ввода
 }
 
 const cancelReply = () => {
-  ReplyPost.value = ''; // Сбрасываем ответ на пост
+  ReplyPost.value = '' // Сбрасываем ответ на пост
 }
 
 onMounted(async () => {
@@ -237,19 +387,32 @@ onMounted(async () => {
     if (!loaded.value) {
       posts.value = [
         {
-          id: null,
-          text: 'Произошла внутреняя ошибка при загрузке данных... \r\n Мы продолжаем пытатся получить данные...',
+          id: 1,
+          text: 'Loading...',
           creator: {
-            id: null,
-            name: 'Данные не загружены',
+            id: 1,
+            name: 'System',
           },
+          created_at: new Date(),
+          updated_at: new Date(),
         },
       ]
       loaded.value = true
     }
   }, 20000)
   await fetchPosts()
-  intervalId.value = setInterval(fetchPosts, 2000)
+  connectChatSocket() // Only call connectChatSocket once
+  adminCheck()
+})
+
+onUnmounted(() => {
+  // Clean up Pusher subscription when component is unmounted
+  if (channel.value) {
+    channel.value.unsubscribe()
+  }
+  if (socket.value) {
+    socket.value.disconnect()
+  }
 })
 </script>
 
@@ -447,5 +610,12 @@ button:disabled {
   color: #0b4988;
   margin-right: 5px;
   font-size: 0.9em;
+}
+
+.reaction-content {
+  color: #333;
+  text-decoration: none;
+  border: #033c799d dashed;
+  border-radius: 15px;
 }
 </style>

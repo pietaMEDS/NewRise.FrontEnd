@@ -2,7 +2,9 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useDevStore } from '@/stores/dev'
 
+const devStore = useDevStore()
 const loginErr = ref('')
 const emailErr = ref('')
 const passwordErr = ref('')
@@ -77,15 +79,8 @@ const handleSubmit = async (e) => {
   isLoading.value = true
 
   try {
-    // Use localhost instead of 127.0.0.1
-    const baseUrl = 'http://localhost:8000'
-
-    // Get CSRF token from cookie
-
-    // Then make the registration request with decoded token
-    const response = await fetch('http://localhost:8000/users/create', {
+    const response = await fetch(devStore.host + '/users/create', {
       method: 'POST',
-      mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -96,7 +91,6 @@ const handleSubmit = async (e) => {
         password: password.value,
         password_confirmation: retryPassword.value,
       }),
-      credentials: 'include',
     })
 
     if (!response.ok) {

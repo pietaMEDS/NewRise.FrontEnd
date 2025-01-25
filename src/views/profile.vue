@@ -10,7 +10,12 @@
       <div class="profile-content">
         <div class="profile-header">
           <div class="avatar">
-            <img :src="user.avatar.path || './src/assets/users/default.png'" alt="Profile picture" />
+            <img
+              v-if="user.avatar"
+              :src="user.avatar.path || './src/assets/users/default.png'"
+              alt="Profile picture"
+            />
+            <img v-else :src="'./src/assets/users/default.png'" alt="Profile picture" />
           </div>
           <div class="user-info">
             <h2>{{ user.name }}</h2>
@@ -19,13 +24,19 @@
         </div>
 
         <div class="profile-details">
-          <button @click="showModal = true" class="update-btn">Edit Profile</button>
+          <button @click="showModal = true" v-if="user.id === authStore.user_id" class="update-btn">
+            Edit Profile
+          </button>
+          <router-link v-if="userVerified" to="/admin"
+            ><button class="update-btn">Админ панель</button></router-link
+          >
         </div>
 
         <div v-if="showModal" class="modal-overlay">
           <div class="modal-message">
-            <h2>Update Profile</h2>
+            <h2>Обновить профиль</h2>
             <form @submit.prevent="updateProfile">
+              <div v-if="formErr" class="error">{{ formErrMessage }}</div>
               <div class="form-group">
                 <label for="name">Имя</label>
                 <input type="text" id="name" v-model="user.name" required />
@@ -39,29 +50,35 @@
               <div class="form-group">
                 <label for="avatar">URL изображения профиля</label>
                 <input
+                  v-if="user.avatar"
                   type="text"
                   id="avatar"
-                  v-model="user.avatar"
+                  v-model="user.avatar.path"
                   placeholder="Введите URL изображения"
                 />
+                <input v-else type="text" id="avatar" placeholder="Введите URL изображения" />
+              </div>
+
+              <div class="form-group">
+                <label for="avatarUpload">Загрузить изображение профиля</label>
+                <input type="file" id="avatarUpload" @change="onFileChange" accept="image/*" />
               </div>
               <div class="form-group">
                 <label>Текущее изображение профиля:</label>
                 <div class="current-avatar" @click="showModal = true">
+                  <div v-if="imageUpdated" class="error">{{ imageUpdatedMessage }}</div>
                   <img
-                    :src="user.avatar || './src/assets/users/default.png'"
+                    :src="user.avatar.path || './src/assets/users/default.png'"
                     alt="Текущее изображение профиля"
                     class="current-avatar-img"
                   />
                 </div>
               </div>
-              <div class="form-group">
-                <label for="avatarUpload">Загрузить изображение профиля</label>
-                <input type="file" id="avatarUpload" @change="onFileChange" accept="image/*" />
-              </div>
               <div class="modal-buttons">
-                <button type="submit" class="update-btn">Update Profile</button>
-                <button type="button" @click="showModal = false" class="cancel-btn">Cancel</button>
+                <button type="submit" class="update-btn">Обновить профиль</button>
+                <button type="button" @click="showModal = false" class="cancel-btn">
+                  Отменить
+                </button>
               </div>
             </form>
           </div>
@@ -74,10 +91,20 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useRoute } from 'vue-router' // Import useRoute
+import { useDevStore } from '@/stores/dev'
+import router from '@/router'
 
+const route = useRoute() // Initialize route
 const authStore = useAuthStore()
 const loaded = ref(false)
 const showModal = ref(false)
+const userVerified = ref(false)
+const imageUpdated = ref(false)
+const imageUpdatedMessage = ref('err')
+const formErr = ref(false)
+const formErrMessage = ref('err')
+const user_id = ref()
 const user = ref({
   name: '',
   email: '',
@@ -85,11 +112,56 @@ const user = ref({
   avatar: '',
 })
 
+const onFileChange = async (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    const formData = new FormData()
+    formData.append('file', file) // Append the file to FormData
+
+    try {
+      const response = await fetch(useDevStore().host + '/AvatarUpload', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authStore.token}`,
+        },
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to upload file')
+      }
+
+      const data = await response.json()
+      user.value.avatar.path = data.path // Update the avatar path with the saved file path
+      imageUpdatedMessage.value = 'Изображение было обновлено!'
+      imageUpdated.value = true
+    } catch (error) {
+      console.error('Error uploading file:', error)
+    }
+  }
+}
+
+const adminCheck = async () => {
+  try {
+    const response = await fetch(useDevStore().host + '/admin/check', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+      },
+    })
+    const data = await response.json()
+
+    if (data.status === '200') {
+      userVerified.value = true
+    }
+  } catch (error) {}
+}
+
 const updateProfile = async () => {
   try {
     let user_data = user.value
 
-    const response = await fetch('http://127.0.0.1:8000/api/users/update', {
+    const response = await fetch(useDevStore().host + '/users/update', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -107,13 +179,24 @@ const updateProfile = async () => {
     const data = await response.json()
     console.log('Profile updated:', data)
   } catch (error) {
+    formErr.value = true
+    formErrMessage.value = 'Произошла ошибка при обновлении профиля,\nПовторите попытку позже.'
     console.error('Error updating profile:', error)
+  } finally {
+    imageUpdatedMessage.value = 'err'
+    imageUpdated.value = false
+    formErr.value = ''
   }
 }
 
 onMounted(async () => {
+  if (route.params.id) {
+    user_id.value = route.params.id
+  } else {
+    user_id.value = authStore.user_id
+  }
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/users/${authStore.user_id}`, {
+    const response = await fetch(`${useDevStore().host}/users/${user_id.value}`, {
       headers: {
         Authorization: `Bearer ${authStore.token}`,
       },
@@ -138,6 +221,8 @@ onMounted(async () => {
       }
     }, 5000)
   }
+
+  adminCheck()
 })
 </script>
 
@@ -290,5 +375,24 @@ onMounted(async () => {
 
 .current-avatar:hover {
   transform: scale(1.05);
+}
+
+.current-avatar-img {
+  max-width: -webkit-fill-available;
+}
+
+footer {
+  position: absolute !important;
+}
+
+.profile-details {
+  display: flex;
+  justify-content: space-around;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
 }
 </style>

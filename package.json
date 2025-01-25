@@ -17,8 +17,13 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@pusher/push-notifications-web": "^1.1.0",
     "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
+    "chart.js": "^4.4.7",
+    "laravel-echo": "^1.18.0",
     "pinia": "^2.2.6",
+    "pusher-js": "^8.4.0-rc2",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5"
   },
@@ -36,6 +41,7 @@
     "prettier": "^3.3.3",
     "start-server-and-test": "^2.0.8",
     "vite": "^5.4.10",
-    "vite-plugin-vue-devtools": "^7.5.4"
+    "vite-plugin-vue-devtools": "^7.5.4",
+    "web-push": "^3.6.7"
   }
 }
