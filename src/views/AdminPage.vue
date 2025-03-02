@@ -5,17 +5,19 @@
         <li v-if="selectedTab.tabletabs" @click="selectedTab.tabletabs = null">
           <i class="bi bi-house-door"></i>
         </li>
-        <li v-for="tab in tabs" @click="FetchData(tab)">{{ tab.name }}</li>
+        <li v-for="tab in tabs" v-bind:key="tab.id" @click="FetchData(tab)">{{ tab.name }}</li>
       </ul>
     </nav>
     <div class="content">
       <table v-if="selectedTab.tabletabs">
         <tr>
-          <td v-for="tabItem in selectedTab.tabletabs">{{ tabItem.name }}</td>
+          <td v-for="tabItem in selectedTab.tabletabs" v-bind:key="tabItem.id">
+            {{ tabItem.name }}
+          </td>
           <td>Action</td>
         </tr>
-        <tr v-for="(item, index) in tabData">
-          <td v-for="(tabItem, tabIndex) in selectedTab.tabletabs">
+        <tr v-for="item in tabData" v-bind:key="item.id">
+          <td v-for="tabItem in selectedTab.tabletabs" v-bind:key="tabItem.id">
             {{ GetResourceData(item, tabItem) }}
           </td>
           <td class="actions-button">
@@ -108,18 +110,20 @@
               <div class="user-details">
                 <h6>{{ deleteData.name }}</h6>
                 <p>{{ deleteData.role.name }}</p>
-                <div class="progress">
+                <div class="progress" v-if="deleteData.progress">
                   <div
                     class="progress-bar"
                     role="progressbar"
-                    style="width: 51%"
-                    aria-valuenow="51"
+                    :style="'width:'+deleteData.progress.current_xp/(deleteData.progress.max_xp*0.01)+'%'"
+                    :width="deleteData.progress.current_xp/(deleteData.progress.max_xp*0.01)"
+                    :aria-valuenow="deleteData.progress.current_xp"
                     aria-valuemin="0"
-                    aria-valuemax="100"
+                    :aria-valuemax="deleteData.progress.max_xp"
                   ></div>
                 </div>
                 <div style="text-align: center">
-                  <span>120/200 (51%) {{ deleteData.rank.name }}</span>
+                  <span v-if="deleteData.progress">{{ deleteData.progress.current_xp }}/{{ deleteData.progress.max_xp }} ({{ deleteData.progress.current_xp/(deleteData.progress.max_xp*0.01) }}%) {{ deleteData.rank.name }}</span>
+                  <span style="background-color: rgb(0 0 0 / 37%); padding: 2px;" v-else> Не имеет ранга </span>
                 </div>
               </div>
             </div>
@@ -165,6 +169,7 @@
                 <p
                   class="post-content"
                   v-for="(postText, postTextIndex) in deleteData[index].split(`\n`)"
+                  v-bind:key="postTextIndex"
                 >
                   {{ postText }}
                 </p>
@@ -237,7 +242,7 @@
             <i class="bi bi-search"></i> Edit ->
             <span class="Headerusername">{{ windowData.typeName }} -> {{ windowData.id }}</span>
           </h5>
-          <button type="button" class="window-close" @click="viewWindowsData[index] = null">
+          <button type="button" class="window-close" @click="editWindowsData[index] = null">
             <i class="bi bi-x-lg"></i>
           </button>
         </div>
@@ -264,18 +269,20 @@
                     </option>
                   </select>
                 </p>
-                <div class="progress">
+                <div class="progress" v-if="windowData.progress">
                   <div
                     class="progress-bar"
                     role="progressbar"
-                    style="width: 51%"
-                    aria-valuenow="51"
+                    :style="'width:'+windowData.progress.current_xp/(windowData.progress.max_xp*0.01)+'%'"
+                    :width="windowData.progress.current_xp/(windowData.progress.max_xp*0.01)"
+                    :aria-valuenow="windowData.progress.current_xp"
                     aria-valuemin="0"
-                    aria-valuemax="100"
+                    :aria-valuemax="windowData.progress.max_xp"
                   ></div>
                 </div>
                 <div style="text-align: center">
-                  <span>120/200 (51%) {{ windowData.rank.name }}</span>
+                  <span v-if="windowData.progress" >{{ windowData.progress.current_xp }}/{{ windowData.progress.max_xp }} ({{ windowData.progress.current_xp/(windowData.progress.max_xp*0.01) }}%) {{ windowData.rank.name }}</span>
+                  <span style="background-color: rgb(0 0 0 / 37%); padding: 2px;" v-else> Не имеет ранга </span>
                 </div>
               </div>
             </div>
@@ -333,9 +340,9 @@
             </div>
           </div>
         </div>
-      </div>
-      <div class="resize-handle" @mousedown="onResizeMouseDown('EID_' + windowData.id + index)">
-        <i class="bi bi-textarea-resize"></i>
+        <div class="resize-handle" @mousedown="onResizeMouseDown('EID_' + windowData.id + index)">
+          <i class="bi bi-textarea-resize"></i>
+        </div>
       </div>
     </div>
     <!--
@@ -394,18 +401,20 @@
             <div class="user-details">
               <h6>{{ windowData.name }}</h6>
               <p>{{ windowData.role.name }}</p>
-              <div class="progress">
+              <div class="progress" v-if="windowData.progress">
                 <div
                   class="progress-bar"
                   role="progressbar"
-                  style="width: 51%"
-                  aria-valuenow="51"
+                  :style="'width:'+windowData.progress.current_xp/(windowData.progress.max_xp*0.01)+'%'"
+                  :width="windowData.progress.current_xp/(windowData.progress.max_xp*0.01)"
+                  :aria-valuenow="windowData.progress.current_xp"
                   aria-valuemin="0"
-                  aria-valuemax="100"
+                  :aria-valuemax="windowData.progress.max_xp"
                 ></div>
               </div>
               <div style="text-align: center">
-                <span>120/200 (51%) {{ windowData.rank.name }}</span>
+                <span v-if="windowData.progress">{{ windowData.progress.current_xp }}/{{ windowData.progress.max_xp }} ({{ windowData.progress.current_xp/(windowData.progress.max_xp*0.01) }}%) {{ windowData.rank.name }}</span>
+                <span style="background-color: rgb(0 0 0 / 37%); padding: 2px;" v-else> Не имеет ранга </span>
               </div>
             </div>
           </div>
@@ -449,6 +458,7 @@
               <p
                 class="post-content"
                 v-for="(postText, postTextIndex) in windowData[index].split(`\n`)"
+                v-bind:key="postTextIndex"
               >
                 {{ postText }}
               </p>
@@ -554,11 +564,11 @@ const tabs = [
   },
 ]
 
-const activityCtxRefresh = () => {
-  const ctx = document.getElementById('Activity')
+const delay = ms => new Promise(res => setTimeout(res, ms));
 
-  if (ctx == null) {
-  }
+const activityCtxRefresh = async () => {
+  await delay(1000)
+  const ctx = document.getElementById('Activity')
 
   const today = new Date()
   const lastWeek = []
@@ -570,6 +580,19 @@ const activityCtxRefresh = () => {
     )
   }
   lastWeek.value = lastWeek.reverse()
+
+  try {
+    let response = await fetch(devStore.host + "/activitycount", {
+      method: 'POST',
+      body: JSON.stringify(lastWeek),
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+      },
+    })
+    console.log(await response.data)
+  } catch (e) {
+    console.log(e)
+  }
 
   new Chart(ctx, {
     type: 'bar',
@@ -623,7 +646,7 @@ const windowToTop = (event) => {
 
 const GetResourceData = (item, tabItem) => {
   if (tabItem.resource.split('.').length == 1) {
-    if (item[tabItem.resource] == null) {
+    if (!item[tabItem.resource]) {
       return 'Загрузка...'
     }
     return item[tabItem.resource].length > 110
@@ -703,6 +726,8 @@ const rolesFetch = async () => {
 }
 
 const OpenEditModal = (item) => {
+  item.type = selectedTab.value.type
+  item.typeName = selectedTab.value.name
   editWindowsData.value.push(item)
 }
 
@@ -1014,7 +1039,7 @@ onMounted(async () => {
 }
 
 .navigation-menu {
-  width: 10%;
+  min-width: 10vw;
   color: white;
   background: linear-gradient(10deg, #0e473b, #2200fd 160%);
 }

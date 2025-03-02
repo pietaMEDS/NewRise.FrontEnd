@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useContextAditionsActionsStore } from './stores/contextFunctions'
+import * as bootstrap from 'bootstrap'
+import { useDevStore } from '@/stores/dev.js'
 
 const authStore = useAuthStore()
 const contextActionsStore = useContextAditionsActionsStore()
@@ -53,12 +55,14 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', closeContextMenu)
 })
+
 </script>
 
 <template>
   <head>
     meta
   </head>
+
   <header>
     <nav class="navbar bg-primary navbar-expand-lg" data-bs-theme="dark">
       <div class="container-fluid">
@@ -90,6 +94,7 @@ onBeforeUnmount(() => {
             </li>
             <li class="nav-item dropdown">
               <RouterLink
+                id="forumsdropdownmenu"
                 class="nav-link dropdown-toggle"
                 to="/forum"
                 role="button"
@@ -98,19 +103,19 @@ onBeforeUnmount(() => {
               >
                 Форум
               </RouterLink>
-              <ul class="dropdown-menu">
+              <ul class="dropdown-menu" aria-labelledby="forumsdropdownmenu">
                 <li>
                   <RouterLink class="dropdown-item" to="/forum">Главная</RouterLink>
                 </li>
                 <li>
-                  <RouterLink class="dropdown-item" to="/forum/chat/3">Устав</RouterLink>
+                  <a class="dropdown-item" href="/forum/chat/3">Устав</a>
                 </li>
                 <li>
-                  <RouterLink class="dropdown-item" to="/forum/chat/5">Предложения</RouterLink>
+                  <a class="dropdown-item" href="/forum/chat/5">Предложения</a>
                 </li>
                 <li><hr class="dropdown-divider" /></li>
                 <li>
-                  <RouterLink class="dropdown-item" :to="rulesURL">Правила</RouterLink>
+                  <a class="dropdown-item" :href="rulesURL">Правила</a>
                 </li>
               </ul>
             </li>
@@ -132,6 +137,13 @@ onBeforeUnmount(() => {
 
   <div @contextmenu.prevent="contextmenu = true">
     <RouterView />
+  </div>
+
+  <div class="notify-windows">
+    <div>
+      <h3>Error</h3>
+      <span>Error msg</span>
+    </div>
   </div>
 
   <div
@@ -204,7 +216,9 @@ onBeforeUnmount(() => {
 <style>
 /* Base styles */
 body {
+  padding-bottom: 200px;
   min-height: 100vh;
+  position: relative;
   display: flex;
   flex-direction: column;
   margin: 0;
@@ -237,9 +251,12 @@ body {
 
 /* Footer styles */
 .footer {
-  position: block;
+  top: auto;
+  bottom: 0;
+  height: 200px;
+  position: absolute;
   width: 100%;
-  margin-top: 5%;
+  margin-top: 200px;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -293,5 +310,20 @@ body {
   margin: 5px 0; /* Margin for the divider */
   border: 0; /* Remove default border */
   border-top: 1px solid #ccc; /* Custom border for the divider */
+}
+
+.notify-windows{
+  width: 15vw;
+  position: fixed;
+  z-index: 9119;
+  top: auto;
+  right: 2vw;
+  left: auto;
+  bottom: 4vh;
+  text-align: center;
+}
+
+.notify-windows div h3 {
+  text-align: start;
 }
 </style>

@@ -9,6 +9,7 @@
         <template v-for="post in posts">
           <div
             v-if="post.status != 'deleted'"
+            v-bind:key="post.id"
             @contextmenu="setDoubleContext(post)"
             class="post"
             :id="`postID_` + post.id"
@@ -32,14 +33,14 @@
                 <div class="post-actions">
                   <button class="action-btn reply" @click="replyToPost(post)">Ответить</button>
                   <button
-                    v-if="post.creator.id === currentUserId || userVerified"
+                    v-if="post.creator.id === currentUserId || userVerified.value"
                     class="action-btn edit"
                     @click="editPost(post)"
                   >
                     Изменить
                   </button>
                   <button
-                    v-if="post.creator.id === currentUserId || userVerified"
+                    v-if="post.creator.id === currentUserId || userVerified.value"
                     class="action-btn delete"
                     @click="deletePost(post.id)"
                   >
@@ -200,7 +201,7 @@ const formatDate = (date) => {
 }
 
 const setDoubleContext = (post) => {
-  if (post.creator.id === currentUserId || userVerified) {
+  if (post.creator.id === currentUserId || userVerified.value) {
     messageActions.value = [
       {
         name: 'Ответить...',
@@ -211,7 +212,7 @@ const setDoubleContext = (post) => {
       {
         name: 'Удалить сообщение',
         action: async function () {
-          deletePost(post.id)
+          deletePost(post)
         },
       },
       {
@@ -260,7 +261,6 @@ const adminCheck = async () => {
 
     if (data.status === '200') {
       userVerified.value = true
-    } else {
     }
   } catch (error) {
     console.error('Ошибка при проверке администратора:', error)
@@ -320,13 +320,22 @@ const fetchPosts = async () => {
 const intervalId = ref(null)
 
 const editPost = (post) => {
-  EditPost.value = post
-  showModal.value = true
+  if (post.creator.id == authStore.user_id){
+    EditPost.value = post
+    showModal.value = true
+  } else {
+    console.log(`no access`)
+  }
+
 }
 
-const deletePost = async (postId) => {
+const deletePost = async (post) => {
+  if (post.creator.id != authStore.user_id){
+    console.log('no access')
+    return null
+  }
   try {
-    const response = await fetch(`${useDevStore().host}/messages/${postId}`, {
+    const response = await fetch(`${useDevStore().host}/messages/${post.id}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${authStore.token}`,

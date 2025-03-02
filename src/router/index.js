@@ -37,7 +37,7 @@ const router = createRouter({
     {
       path: '/forum/chat/:id',
       name: 'forumchat',
-      component: () => import('../views/forumchat.vue'),
+      component: () => import('../views/forum-chat.vue'),
     },
     {
       path: '/admin',

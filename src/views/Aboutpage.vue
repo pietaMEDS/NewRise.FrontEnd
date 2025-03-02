@@ -78,14 +78,14 @@ onUnmounted(() => {
           </div>
         </div>
         <div class="carousel-item">
-          <img src="@/assets/backimage.png" alt="Republic capital ship" class="d-block w-100" />
+          <img src="@/assets/backimage1.png" alt="Republic capital ship" class="d-block w-100" />
           <div class="carousel-caption d-none d-md-block">
             <h3 class="text-shadow">Огромный флот</h3>
             <p class="lead text-shadow">Управляйте мощными кораблями Республики</p>
           </div>
         </div>
         <div class="carousel-item">
-          <img src="@/assets/backimage.png" alt="Clone trooper squad" class="d-block w-100" />
+          <img src="@/assets/backimage2.png" alt="Clone trooper squad" class="d-block w-100" />
           <div class="carousel-caption d-none d-md-block">
             <h3 class="text-shadow">Командная игра</h3>
             <p class="lead text-shadow">Сражайтесь плечом к плечу с братьями-клонами</p>

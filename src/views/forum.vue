@@ -33,7 +33,6 @@ const adminCheck = async () => {
 
     if (data.status === '200') {
       isAdmin.value = true
-    } else {
     }
   } catch (error) {
     console.error('Ошибка при проверке администратора:', error)
@@ -205,6 +204,12 @@ const CheckPrivate = async (id) => {
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  name: 'ForumView',
+}
+</script>
 
 <style scoped>
 .forum-categories {

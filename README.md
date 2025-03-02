@@ -31,7 +31,7 @@ npm run build
 ### Run Headed Component Tests with [Cypress Component Testing](https://on.cypress.io/component)
 
 ```sh
-npm run test:unit:dev # or `npm run test:unit` for headless testing
+npm run test:unit:dev  # or `npm run test:unit` for headless testing
 ```
 
 ### Run End-to-End Tests with [Cypress](https://www.cypress.io/)

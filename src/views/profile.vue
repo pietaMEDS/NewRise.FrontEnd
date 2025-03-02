@@ -16,15 +16,30 @@
               alt="Profile picture"
             />
             <img v-else :src="'./src/assets/users/default.png'" alt="Profile picture" />
-          </div>
-          <div class="user-info">
             <h2>{{ user.name }}</h2>
-            <p>{{ user.email }}</p>
+          </div>
+          <div class="rank-info">
+            <span v-if="user.progress" style="width: -webkit-fill-available; display: block; text-align: center;">{{ user.rank.name }}</span>
+            <div class="progress" v-if="user.progress">
+              <div
+                class="progress-bar"
+                role="progressbar"
+                :style="'width:'+user.progress.current_xp/(user.progress.max_xp*0.01)+'%'"
+                :width="user.progress.current_xp/(user.progress.max_xp*0.01)"
+                :aria-valuenow="user.progress.current_xp"
+                aria-valuemin="0"
+                :aria-valuemax="user.progress.max_xp"
+              ></div>
+            </div>
+            <div style="text-align: center">
+              <span v-if="user.progress">{{ user.progress.current_xp }}/{{ user.progress.max_xp }} ({{ user.progress.current_xp/(user.progress.max_xp*0.01) }}%)</span>
+              <span style="background-color: rgb(0 0 0 / 37%); padding: 2px;" v-else> Не имеет ранга </span>
+            </div>
           </div>
         </div>
 
         <div class="profile-details">
-          <button @click="showModal = true" v-if="user.id === authStore.user_id" class="update-btn">
+          <button @click="showModal = true" v-if="user.id == authStore.user_id" class="update-btn">
             Edit Profile
           </button>
           <router-link v-if="userVerified" to="/admin"
@@ -68,7 +83,7 @@
                 <div class="current-avatar" @click="showModal = true">
                   <div v-if="imageUpdated" class="error">{{ imageUpdatedMessage }}</div>
                   <img
-                    :src="user.avatar.path || './src/assets/users/default.png'"
+                    :src="user.avatar?.path || './src/assets/users/default.png'"
                     alt="Текущее изображение профиля"
                     class="current-avatar-img"
                   />
@@ -132,7 +147,7 @@ const onFileChange = async (event) => {
       }
 
       const data = await response.json()
-      user.value.avatar.path = data.path // Update the avatar path with the saved file path
+      user.value.avatar.path = await data.path
       imageUpdatedMessage.value = 'Изображение было обновлено!'
       imageUpdated.value = true
     } catch (error) {
@@ -244,23 +259,41 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   margin-bottom: 30px;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: space-around;
 }
 
 .avatar {
-  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 3vw;
+  align-content: center;
+  flex-wrap: nowrap;
+  width: 100%;
   height: 100px;
   margin-right: 20px;
 }
 
 .avatar img {
-  width: 100%;
-  height: 100%;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   object-fit: cover;
 }
 
+.avatar h2{
+  padding-left: 1vw;
+}
+
 .form-group {
   margin-bottom: 20px;
+}
+
+.progress {
+  min-width: 15vw
 }
 
 .form-group label {
@@ -379,6 +412,7 @@ onMounted(async () => {
 
 .current-avatar-img {
   max-width: -webkit-fill-available;
+  max-height: 40vh;
 }
 
 footer {
