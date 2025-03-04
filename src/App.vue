@@ -4,11 +4,14 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useContextAditionsActionsStore } from './stores/contextFunctions'
+import { useNotificationsStore } from '@/stores/pushNotifications.js'
 import * as bootstrap from 'bootstrap'
 import { useDevStore } from '@/stores/dev.js'
 
+const notifications = ref([])
 const authStore = useAuthStore()
 const contextActionsStore = useContextAditionsActionsStore()
+const notificationsStore = useNotificationsStore()
 const rulesURL = '/forum/chat/7'
 const contextmenu = ref(false)
 const contextMenuFunctional = [
@@ -108,14 +111,14 @@ onBeforeUnmount(() => {
                   <RouterLink class="dropdown-item" to="/forum">Главная</RouterLink>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="/forum/chat/3">Устав</a>
+                  <RouterLink class="dropdown-item" to="/forum/chat/3">Устав</RouterLink>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="/forum/chat/5">Предложения</a>
+                  <RouterLink class="dropdown-item" to="/forum/chat/5">Предложения</RouterLink>
                 </li>
                 <li><hr class="dropdown-divider" /></li>
                 <li>
-                  <a class="dropdown-item" :href="rulesURL">Правила</a>
+                  <RouterLink class="dropdown-item" :to="rulesURL">Правила</RouterLink>
                 </li>
               </ul>
             </li>
@@ -140,10 +143,14 @@ onBeforeUnmount(() => {
   </div>
 
   <div class="notify-windows">
-    <div>
-      <h3>Error</h3>
-      <span>Error msg</span>
-    </div>
+    <template v-for="(item, index) in notificationsStore.Notifications" :key="index">
+      <div v-if="item" :class="'notify-window notify-'+item.type">
+        <h3>{{ item.type }}</h3>
+        <hr>
+        <span>{{ item.message }}</span>
+      </div>
+    </template>
+
   </div>
 
   <div
@@ -325,5 +332,19 @@ body {
 
 .notify-windows div h3 {
   text-align: start;
+}
+
+.notify-window{
+  margin: 5px 0;
+  color: black;
+  background: rgb(0 130 247 / 33%);
+  border: rgb(0 130 247 / 70%) solid 3px;
+  padding: 10px;
+  border-radius: 15px;
+}
+
+.notify-Error{
+  background: rgb(255 62 62 / 33%);
+  border: rgb(5 0 0 / 77%) solid 3px;
 }
 </style>

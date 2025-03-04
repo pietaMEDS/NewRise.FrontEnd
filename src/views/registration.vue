@@ -3,8 +3,10 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useDevStore } from '@/stores/dev'
+import { useNotificationsStore } from '@/stores/pushNotifications.js'
 
 const devStore = useDevStore()
+const notificationStore = useNotificationsStore()
 const loginErr = ref('')
 const emailErr = ref('')
 const passwordErr = ref('')
@@ -38,6 +40,7 @@ const validateForm = () => {
 
   // Validate login
   if (!login.value.trim()) {
+    notificationStore.addNotification({type:'Error', message:"Логин обязателен"})
     loginErr.value = 'Логин обязателен'
     isValid = false
   }
@@ -45,24 +48,28 @@ const validateForm = () => {
   // Validate email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(email.value)) {
+    notificationStore.addNotification({type:'Error', message:"Введите корректный email адрес"})
     emailErr.value = 'Введите корректный email адрес'
     isValid = false
   }
 
   // Validate password
   if (password.value.length < 6) {
+    notificationStore.addNotification({type:'Error', message:"Пароль должен содержать минимум 6 символов"})
     passwordErr.value = 'Пароль должен содержать минимум 6 символов'
     isValid = false
   }
 
   // Validate password match
   if (password.value !== retryPassword.value) {
+    notificationStore.addNotification({type:'Error', message:"Пароли не совпадают"})
     retryPasswordErr.value = 'Пароли не совпадают'
     isValid = false
   }
 
   // Validate terms
   if (!terms.value) {
+    notificationStore.addNotification({type:'Error', message:"Необходимо принять условия использования"})
     termErr.value = 'Необходимо принять условия использования'
     isValid = false
   }

@@ -582,9 +582,9 @@ const activityCtxRefresh = async () => {
   lastWeek.value = lastWeek.reverse()
 
   try {
-    let response = await fetch(devStore.host + "/activitycount", {
-      method: 'POST',
-      body: JSON.stringify(lastWeek),
+    let response = await fetch(devStore.host + "/activitycount" , {
+      method: 'GET',
+      body: JSON.stringify({lastWeek}),
       headers: {
         Authorization: `Bearer ${authStore.token}`,
       },

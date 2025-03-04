@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useDevStore } from '@/stores/dev'
+import { useNotificationsStore } from '@/stores/pushNotifications.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -29,7 +30,6 @@ const adminCheck = async () => {
       },
     })
     const data = await response.json()
-    console.log(data.status)
 
     if (data.status === '200') {
       isAdmin.value = true
@@ -50,6 +50,7 @@ const fetchCategories = async () => {
     if (!response.ok) {
       throw new Error(response.statusText)
     }
+
     const data = await response.json()
     forumCategories.value = data.data
     error.value = null
