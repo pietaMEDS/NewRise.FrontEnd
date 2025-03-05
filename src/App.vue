@@ -7,6 +7,7 @@ import { useContextAditionsActionsStore } from './stores/contextFunctions'
 import { useNotificationsStore } from '@/stores/pushNotifications.js'
 import * as bootstrap from 'bootstrap'
 import { useDevStore } from '@/stores/dev.js'
+import Pusher from 'pusher-js'
 
 const notifications = ref([])
 const authStore = useAuthStore()
@@ -14,6 +15,9 @@ const contextActionsStore = useContextAditionsActionsStore()
 const notificationsStore = useNotificationsStore()
 const rulesURL = '/forum/chat/7'
 const contextmenu = ref(false)
+const socket = ref(null)
+const channel = ref(null)
+let connectNotifySocket = null
 const contextMenuFunctional = [
   {
     name: 'Action1',
@@ -58,6 +62,40 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', closeContextMenu)
 })
+
+if(authStore.isAuthenticated()){
+  connectNotifySocket = () => {
+    socket.value = new Pusher('c99fad2f51f6408f6964', {
+      cluster: 'eu',
+      encrypted: true,
+    })
+
+    // Create channel for this forum
+    channel.value = socket.value.subscribe(`user-Notifier-${authStore.user_id}`)
+
+    // Bind to new post events
+    channel.value.bind('notify', (data) => {
+      notificationsStore.addNotification({ type: data.type, message: data.message })
+    })
+
+    // Handle connection states
+    socket.value.connection.bind('connected', () => {
+      console.log(`Notifier connected to user ${authStore.user_id}`)
+    })
+
+    socket.value.connection.bind('disconnected', () => {
+      console.log(`Notifier disconnected from user ${authStore.user_id}`)
+    })
+
+    socket.value.connection.bind('error', (error) => {
+      console.error('Pusher connection error:', error)
+    })
+  }
+
+  connectNotifySocket()
+} else if( socket.value ) {
+  socket.value.unsubscribe("my-channel");
+}
 
 </script>
 
@@ -202,6 +240,7 @@ onBeforeUnmount(() => {
           <h5>Ссылки</h5>
           <ul class="list-unstyled">
             <li><RouterLink :to="rulesURL" class="text-light">Правила</RouterLink></li>
+            <li><RouterLink :to="{ name: 'reports' }" class="text-light">Поддержка</RouterLink></li>
             <li><RouterLink :to="{ name: `forumthemes` }" class="text-light">Форум</RouterLink></li>
           </ul>
         </div>

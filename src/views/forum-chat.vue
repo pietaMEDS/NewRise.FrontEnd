@@ -142,7 +142,6 @@ const socket = ref(null)
 const channel = ref(null)
 
 const connectChatSocket = () => {
-  // Initialize Pusher with your app key
   socket.value = new Pusher('c99fad2f51f6408f6964', {
     cluster: 'eu',
     encrypted: true,

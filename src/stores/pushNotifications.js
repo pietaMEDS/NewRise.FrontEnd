@@ -12,6 +12,6 @@ export const useNotificationsStore = defineStore('NotificationsFunction', {
       setTimeout( ()=> {
         this.Notifications[newNotificationIndex] = null
       },10000)
-    }
+    },
   },
 })
