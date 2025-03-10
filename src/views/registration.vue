@@ -40,7 +40,7 @@ const validateForm = () => {
 
   // Validate login
   if (!login.value.trim()) {
-    notificationStore.addNotification({type:'Error', message:"Логин обязателен"})
+    notificationStore.addNotification({ type: 'Error', message: 'Логин обязателен' })
     loginErr.value = 'Логин обязателен'
     isValid = false
   }
@@ -48,28 +48,34 @@ const validateForm = () => {
   // Validate email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(email.value)) {
-    notificationStore.addNotification({type:'Error', message:"Введите корректный email адрес"})
+    notificationStore.addNotification({ type: 'Error', message: 'Введите корректный email адрес' })
     emailErr.value = 'Введите корректный email адрес'
     isValid = false
   }
 
   // Validate password
   if (password.value.length < 6) {
-    notificationStore.addNotification({type:'Error', message:"Пароль должен содержать минимум 6 символов"})
+    notificationStore.addNotification({
+      type: 'Error',
+      message: 'Пароль должен содержать минимум 6 символов',
+    })
     passwordErr.value = 'Пароль должен содержать минимум 6 символов'
     isValid = false
   }
 
   // Validate password match
   if (password.value !== retryPassword.value) {
-    notificationStore.addNotification({type:'Error', message:"Пароли не совпадают"})
+    notificationStore.addNotification({ type: 'Error', message: 'Пароли не совпадают' })
     retryPasswordErr.value = 'Пароли не совпадают'
     isValid = false
   }
 
   // Validate terms
   if (!terms.value) {
-    notificationStore.addNotification({type:'Error', message:"Необходимо принять условия использования"})
+    notificationStore.addNotification({
+      type: 'Error',
+      message: 'Необходимо принять условия использования',
+    })
     termErr.value = 'Необходимо принять условия использования'
     isValid = false
   }
@@ -132,7 +138,6 @@ const handleSubmit = async (e) => {
           type="text"
           class="form-control"
           id="login"
-          required
           aria-describedby="login"
           placeholder="Введите логин"
         />
@@ -142,10 +147,9 @@ const handleSubmit = async (e) => {
         <label for="email">Email адрес</label>
         <input
           v-model="email"
-          type="email"
+          type="text"
           class="form-control"
           id="email"
-          required
           aria-describedby="email"
           placeholder="Введите Email адрес"
         />
@@ -158,7 +162,6 @@ const handleSubmit = async (e) => {
           type="password"
           class="form-control"
           id="password"
-          required
           placeholder="Пароль"
         />
         <small id="passwordHelper" class="form-text text-muted">{{ passwordErr }}</small>
@@ -170,13 +173,12 @@ const handleSubmit = async (e) => {
           type="password"
           class="form-control"
           id="retrypassword"
-          required
           placeholder="Password"
         />
         <small id="retryPasswordHelper" class="form-text text-muted">{{ retryPasswordErr }}</small>
       </div>
       <div class="form-check">
-        <input v-model="terms" required type="checkbox" class="form-check-input" id="term" />
+        <input v-model="terms" type="checkbox" class="form-check-input" id="term" />
         <label class="form-check-label" for="term">Я согласен с Условиями использования</label>
         <small id="termHelper" class="form-text text-muted">{{ termErr }}</small>
       </div>
@@ -204,7 +206,7 @@ const handleSubmit = async (e) => {
   background-attachment: fixed;
   min-height: 100vh;
   height: 100%;
-  position: relative;
+  position: sticky;
   overflow: hidden;
 }
 

@@ -63,7 +63,7 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', closeContextMenu)
 })
 
-if(authStore.isAuthenticated()){
+if (authStore.isAuthenticated()) {
   connectNotifySocket = () => {
     socket.value = new Pusher('c99fad2f51f6408f6964', {
       cluster: 'eu',
@@ -93,17 +93,16 @@ if(authStore.isAuthenticated()){
   }
 
   connectNotifySocket()
-} else if( socket.value ) {
-  socket.value.unsubscribe("my-channel");
+} else if (socket.value) {
+  socket.value.unsubscribe('my-channel')
 }
-
 </script>
 
 <template>
   <head>
     meta
   </head>
-
+  <div id="wip">WIP | Version: {{ useDevStore().Version }}</div>
   <header>
     <nav class="navbar bg-primary navbar-expand-lg" data-bs-theme="dark">
       <div class="container-fluid">
@@ -182,13 +181,12 @@ if(authStore.isAuthenticated()){
 
   <div class="notify-windows">
     <template v-for="(item, index) in notificationsStore.Notifications" :key="index">
-      <div v-if="item" :class="'notify-window notify-'+item.type">
+      <div v-if="item" :class="'notify-window notify-' + item.type">
         <h3>{{ item.type }}</h3>
-        <hr>
+        <hr />
         <span>{{ item.message }}</span>
       </div>
     </template>
-
   </div>
 
   <div
@@ -240,7 +238,7 @@ if(authStore.isAuthenticated()){
           <h5>Ссылки</h5>
           <ul class="list-unstyled">
             <li><RouterLink :to="rulesURL" class="text-light">Правила</RouterLink></li>
-            <li><RouterLink :to="{ name: 'reports' }" class="text-light">Поддержка</RouterLink></li>
+            <li><RouterLink :to="{ name: 'report' }" class="text-light">Поддержка</RouterLink></li>
             <li><RouterLink :to="{ name: `forumthemes` }" class="text-light">Форум</RouterLink></li>
           </ul>
         </div>
@@ -260,7 +258,7 @@ if(authStore.isAuthenticated()){
 </template>
 
 <style>
-/* Base styles */
+<!--/* Base styles */-->
 body {
   padding-bottom: 200px;
   min-height: 100vh;
@@ -299,7 +297,7 @@ body {
 .footer {
   top: auto;
   bottom: 0;
-  height: 200px;
+  height: 35vh;
   position: absolute;
   width: 100%;
   margin-top: 200px;
@@ -358,7 +356,7 @@ body {
   border-top: 1px solid #ccc; /* Custom border for the divider */
 }
 
-.notify-windows{
+.notify-windows {
   width: 15vw;
   position: fixed;
   z-index: 9119;
@@ -373,7 +371,7 @@ body {
   text-align: start;
 }
 
-.notify-window{
+.notify-window {
   margin: 5px 0;
   color: black;
   background: rgb(0 130 247 / 33%);
@@ -382,7 +380,7 @@ body {
   border-radius: 15px;
 }
 
-.notify-Error{
+.notify-Error {
   background: rgb(255 62 62 / 33%);
   border: rgb(5 0 0 / 77%) solid 3px;
 }

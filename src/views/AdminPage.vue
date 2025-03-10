@@ -114,16 +114,26 @@
                   <div
                     class="progress-bar"
                     role="progressbar"
-                    :style="'width:'+deleteData.progress.current_xp/(deleteData.progress.max_xp*0.01)+'%'"
-                    :width="deleteData.progress.current_xp/(deleteData.progress.max_xp*0.01)"
+                    :style="
+                      'width:' +
+                      deleteData.progress.current_xp / (deleteData.progress.max_xp * 0.01) +
+                      '%'
+                    "
+                    :width="deleteData.progress.current_xp / (deleteData.progress.max_xp * 0.01)"
                     :aria-valuenow="deleteData.progress.current_xp"
                     aria-valuemin="0"
                     :aria-valuemax="deleteData.progress.max_xp"
                   ></div>
                 </div>
                 <div style="text-align: center">
-                  <span v-if="deleteData.progress">{{ deleteData.progress.current_xp }}/{{ deleteData.progress.max_xp }} ({{ deleteData.progress.current_xp/(deleteData.progress.max_xp*0.01) }}%) {{ deleteData.rank.name }}</span>
-                  <span style="background-color: rgb(0 0 0 / 37%); padding: 2px;" v-else> Не имеет ранга </span>
+                  <span v-if="deleteData.progress"
+                    >{{ deleteData.progress.current_xp }}/{{ deleteData.progress.max_xp }} ({{
+                      deleteData.progress.current_xp / (deleteData.progress.max_xp * 0.01)
+                    }}%) {{ deleteData.rank.name }}</span
+                  >
+                  <span style="background-color: rgb(0 0 0 / 37%); padding: 2px" v-else>
+                    Не имеет ранга
+                  </span>
                 </div>
               </div>
             </div>
@@ -273,16 +283,26 @@
                   <div
                     class="progress-bar"
                     role="progressbar"
-                    :style="'width:'+windowData.progress.current_xp/(windowData.progress.max_xp*0.01)+'%'"
-                    :width="windowData.progress.current_xp/(windowData.progress.max_xp*0.01)"
+                    :style="
+                      'width:' +
+                      windowData.progress.current_xp / (windowData.progress.max_xp * 0.01) +
+                      '%'
+                    "
+                    :width="windowData.progress.current_xp / (windowData.progress.max_xp * 0.01)"
                     :aria-valuenow="windowData.progress.current_xp"
                     aria-valuemin="0"
                     :aria-valuemax="windowData.progress.max_xp"
                   ></div>
                 </div>
                 <div style="text-align: center">
-                  <span v-if="windowData.progress" >{{ windowData.progress.current_xp }}/{{ windowData.progress.max_xp }} ({{ windowData.progress.current_xp/(windowData.progress.max_xp*0.01) }}%) {{ windowData.rank.name }}</span>
-                  <span style="background-color: rgb(0 0 0 / 37%); padding: 2px;" v-else> Не имеет ранга </span>
+                  <span v-if="windowData.progress"
+                    >{{ windowData.progress.current_xp }}/{{ windowData.progress.max_xp }} ({{
+                      windowData.progress.current_xp / (windowData.progress.max_xp * 0.01)
+                    }}%) {{ windowData.rank.name }}</span
+                  >
+                  <span style="background-color: rgb(0 0 0 / 37%); padding: 2px" v-else>
+                    Не имеет ранга
+                  </span>
                 </div>
               </div>
             </div>
@@ -405,16 +425,26 @@
                 <div
                   class="progress-bar"
                   role="progressbar"
-                  :style="'width:'+windowData.progress.current_xp/(windowData.progress.max_xp*0.01)+'%'"
-                  :width="windowData.progress.current_xp/(windowData.progress.max_xp*0.01)"
+                  :style="
+                    'width:' +
+                    windowData.progress.current_xp / (windowData.progress.max_xp * 0.01) +
+                    '%'
+                  "
+                  :width="windowData.progress.current_xp / (windowData.progress.max_xp * 0.01)"
                   :aria-valuenow="windowData.progress.current_xp"
                   aria-valuemin="0"
                   :aria-valuemax="windowData.progress.max_xp"
                 ></div>
               </div>
               <div style="text-align: center">
-                <span v-if="windowData.progress">{{ windowData.progress.current_xp }}/{{ windowData.progress.max_xp }} ({{ windowData.progress.current_xp/(windowData.progress.max_xp*0.01) }}%) {{ windowData.rank.name }}</span>
-                <span style="background-color: rgb(0 0 0 / 37%); padding: 2px;" v-else> Не имеет ранга </span>
+                <span v-if="windowData.progress"
+                  >{{ windowData.progress.current_xp }}/{{ windowData.progress.max_xp }} ({{
+                    windowData.progress.current_xp / (windowData.progress.max_xp * 0.01)
+                  }}%) {{ windowData.rank.name }}</span
+                >
+                <span style="background-color: rgb(0 0 0 / 37%); padding: 2px" v-else>
+                  Не имеет ранга
+                </span>
               </div>
             </div>
           </div>
@@ -564,7 +594,7 @@ const tabs = [
   },
 ]
 
-const delay = ms => new Promise(res => setTimeout(res, ms));
+const delay = (ms) => new Promise((res) => setTimeout(res, ms))
 
 const activityCtxRefresh = async () => {
   await delay(1000)
@@ -582,9 +612,9 @@ const activityCtxRefresh = async () => {
   lastWeek.value = lastWeek.reverse()
 
   try {
-    let response = await fetch(devStore.host + "/activitycount" , {
+    let response = await fetch(devStore.host + '/activitycount', {
       method: 'GET',
-      body: JSON.stringify({lastWeek}),
+      body: JSON.stringify({ lastWeek }),
       headers: {
         Authorization: `Bearer ${authStore.token}`,
       },

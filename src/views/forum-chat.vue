@@ -125,6 +125,7 @@ import router from '@/router'
 import { useContextAditionsActionsStore } from '@/stores/contextFunctions'
 import Pusher from 'pusher-js'
 import { useDevStore } from '@/stores/dev'
+import { useNotificationsStore } from '@/stores/pushNotifications.js'
 
 const authStore = useAuthStore()
 const route = useRoute()
@@ -140,6 +141,7 @@ const messageActions = ref()
 const contextActionsStore = useContextAditionsActionsStore()
 const socket = ref(null)
 const channel = ref(null)
+const notificationStore = useNotificationsStore()
 
 const connectChatSocket = () => {
   socket.value = new Pusher('c99fad2f51f6408f6964', {
@@ -297,6 +299,7 @@ const createPost = async () => {
     newPost.value = ''
     ReplyPost.value = ''
   } catch (error) {
+    notificationStore.addNotification({ type: 'Error', message: 'При отправки сообщения произошла ошибка' })
     console.error('Ошибка при создании поста:', error)
   }
 }
@@ -319,17 +322,16 @@ const fetchPosts = async () => {
 const intervalId = ref(null)
 
 const editPost = (post) => {
-  if (post.creator.id == authStore.user_id){
+  if (post.creator.id == authStore.user_id) {
     EditPost.value = post
     showModal.value = true
   } else {
     console.log(`no access`)
   }
-
 }
 
 const deletePost = async (post) => {
-  if (post.creator.id != authStore.user_id){
+  if (post.creator.id != authStore.user_id) {
     console.log('no access')
     return null
   }

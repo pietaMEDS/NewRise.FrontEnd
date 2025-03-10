@@ -19,21 +19,31 @@
             <h2>{{ user.name }}</h2>
           </div>
           <div class="rank-info">
-            <span v-if="user.progress" style="width: -webkit-fill-available; display: block; text-align: center;">{{ user.rank.name }}</span>
+            <span
+              v-if="user.progress"
+              style="width: -webkit-fill-available; display: block; text-align: center"
+              >{{ user.rank.name }}</span
+            >
             <div class="progress" v-if="user.progress">
               <div
                 class="progress-bar"
                 role="progressbar"
-                :style="'width:'+user.progress.current_xp/(user.progress.max_xp*0.01)+'%'"
-                :width="user.progress.current_xp/(user.progress.max_xp*0.01)"
+                :style="'width:' + user.progress.current_xp / (user.progress.max_xp * 0.01) + '%'"
+                :width="user.progress.current_xp / (user.progress.max_xp * 0.01)"
                 :aria-valuenow="user.progress.current_xp"
                 aria-valuemin="0"
                 :aria-valuemax="user.progress.max_xp"
               ></div>
             </div>
             <div style="text-align: center">
-              <span v-if="user.progress">{{ user.progress.current_xp }}/{{ user.progress.max_xp }} ({{ user.progress.current_xp/(user.progress.max_xp*0.01) }}%)</span>
-              <span style="background-color: rgb(0 0 0 / 37%); padding: 2px;" v-else> Не имеет ранга </span>
+              <span v-if="user.progress"
+                >{{ user.progress.current_xp }}/{{ user.progress.max_xp }} ({{
+                  user.progress.current_xp / (user.progress.max_xp * 0.01)
+                }}%)</span
+              >
+              <span style="background-color: rgb(0 0 0 / 37%); padding: 2px" v-else>
+                Не имеет ранга
+              </span>
             </div>
           </div>
         </div>
@@ -284,7 +294,7 @@ onMounted(async () => {
   object-fit: cover;
 }
 
-.avatar h2{
+.avatar h2 {
   padding-left: 1vw;
 }
 
@@ -293,7 +303,7 @@ onMounted(async () => {
 }
 
 .progress {
-  min-width: 15vw
+  min-width: 15vw;
 }
 
 .form-group label {

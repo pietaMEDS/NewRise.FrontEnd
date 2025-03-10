@@ -9,9 +9,9 @@ export const useNotificationsStore = defineStore('NotificationsFunction', {
     addNotification(data) {
       let newNotificationIndex = this.Notifications.length
       this.Notifications.push(data)
-      setTimeout( ()=> {
+      setTimeout(() => {
         this.Notifications[newNotificationIndex] = null
-      },10000)
+      }, 10000)
     },
   },
 })

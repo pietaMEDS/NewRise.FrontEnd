@@ -9,6 +9,16 @@ const router = createRouter({
       component: () => import('../views/AboutPage.vue'),
     },
     {
+      path: '/404',
+      name: '404',
+      component: () => import('../views/errors/404.vue'),
+    },
+    {
+      path: '/423',
+      name: '423',
+      component: () => import('../views/errors/423.vue'),
+    },
+    {
       path: '/registration',
       name: 'registration',
       component: () => import('../views/registration.vue'),
@@ -50,9 +60,31 @@ const router = createRouter({
       component: () => import('../views/LogsPage.vue'),
     },
     {
-      path: '/reports',
+      path: '/report',
+      name: 'report',
+      redirect: '/423',
+      // component: () => import('../views/ReportPage.vue'),
+    },
+    {
+      path: '/reports/:link',
       name: 'reports',
-      component: () => import('../views/ReportPage.vue'),
+      redirect: '/423',
+      // component: () => import('../views/ReportChat.vue'),
+    },
+    {
+      path: '/CF_CUXUI_results',
+      name: 'CF_CUXUI_results',
+      // redirect: '/423',
+      component: () => import('../views/CF_CUXUI_results.vue'),
+    },
+
+
+
+
+
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/404',
     }
   ],
 })
