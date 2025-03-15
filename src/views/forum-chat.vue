@@ -33,16 +33,17 @@
                 <div class="post-actions">
                   <button class="action-btn reply" @click="replyToPost(post)">Ответить</button>
                   <button
-                    v-if="post.creator.id === currentUserId || userVerified.value"
+                    v-if="post.creator.id == currentUserId || userVerified"
                     class="action-btn edit"
                     @click="editPost(post)"
                   >
                     Изменить
                   </button>
+                  {{post.id}}
                   <button
-                    v-if="post.creator.id === currentUserId || userVerified.value"
+                    v-if="post.creator.id == currentUserId || userVerified"
                     class="action-btn delete"
-                    @click="deletePost(post.id)"
+                    @click="deletePost(post)"
                   >
                     Удалить
                   </button>
@@ -331,7 +332,8 @@ const editPost = (post) => {
 }
 
 const deletePost = async (post) => {
-  if (post.creator.id != authStore.user_id) {
+  if (post.creator.id != authStore.user_id && !userVerified.value) {
+    console.log(userVerified.value)
     console.log('no access')
     return null
   }

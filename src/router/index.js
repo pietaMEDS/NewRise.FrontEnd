@@ -6,17 +6,17 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('../views/AboutPage.vue'),
+      component: () => import('../views/NewsPage.vue'),
     },
     {
       path: '/404',
       name: '404',
-      component: () => import('../views/errors/404.vue'),
+      component: () => import('../views/errors/Error-404.vue'),
     },
     {
       path: '/423',
       name: '423',
-      component: () => import('../views/errors/423.vue'),
+      component: () => import('../views/errors/Error-423.vue'),
     },
     {
       path: '/registration',
@@ -74,8 +74,8 @@ const router = createRouter({
     {
       path: '/CF_CUXUI_results',
       name: 'CF_CUXUI_results',
-      // redirect: '/423',
-      component: () => import('../views/CF_CUXUI_results.vue'),
+      redirect: '/423',
+      // component: () => import('../views/CF_CUXUI_results.vue'),
     },
 
 

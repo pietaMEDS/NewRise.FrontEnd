@@ -8,8 +8,10 @@ import { useNotificationsStore } from '@/stores/pushNotifications.js'
 import * as bootstrap from 'bootstrap'
 import { useDevStore } from '@/stores/dev.js'
 import Pusher from 'pusher-js'
+import { ClientJS } from 'clientjs'
 
 const notifications = ref([])
+const client = new ClientJS()
 const authStore = useAuthStore()
 const contextActionsStore = useContextAditionsActionsStore()
 const notificationsStore = useNotificationsStore()
@@ -62,6 +64,12 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', closeContextMenu)
 })
+
+console.log(`FingerPrint: ${client.getFingerprint()}`)
+console.log(`Custom FingerPrint: ${client.getCustomFingerprint()}`)
+console.log(`Browser Data: ${client.getBrowserData().ua }`)
+console.log(client.getBrowserData())
+
 
 if (authStore.isAuthenticated()) {
   connectNotifySocket = () => {

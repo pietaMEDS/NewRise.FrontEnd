@@ -1,6 +1,6 @@
 {
   "name": "newrise",
-  "version": "1.2.2",
+  "version": "1.5.7",
   "private": true,
   "type": "module",
   "scripts": {
@@ -21,6 +21,7 @@
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "chart.js": "^4.4.7",
+    "clientjs": "^0.2.1",
     "laravel-echo": "^1.18.0",
     "pinia": "^2.2.6",
     "playwright-test": "^14.1.9",

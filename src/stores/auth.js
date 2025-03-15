@@ -5,6 +5,8 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: null,
     user_id: null,
+    fingerprint: null,
+    c_fingerprint: null,
   }),
 
   actions: {
@@ -36,6 +38,11 @@ export const useAuthStore = defineStore('auth', {
       }
       return !!this.token
     },
+
+    setFingerprints(fingerprints) {
+      this.fingerprint = fingerprints.main;
+      this.c_fingerprint = fingerprints.custom;
+    }
   },
 
   // Optionally initialize token from localStorage
