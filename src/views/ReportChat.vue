@@ -1,17 +1,17 @@
 <script setup>
-import { ref, onMounted, computed, watch, nextTick } from 'vue';
-import { useRoute } from 'vue-router';
-import { useDevStore } from '@/stores/dev.js';
-import Pusher from 'pusher-js';
+import { ref, onMounted, computed, watch, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
+import { useDevStore } from '@/stores/dev.js'
+import Pusher from 'pusher-js'
 import { useAuthStore } from '@/stores/auth.js'
 
-const route = useRoute();
-const posts = ref([]);
-const reportData = ref(null);
-const messageInput = ref('');
-const sending = ref(false);
-const error = ref(null);
-const chatContainer = ref(null);
+const route = useRoute()
+const posts = ref([])
+const reportData = ref(null)
+const messageInput = ref('')
+const sending = ref(false)
+const error = ref(null)
+const chatContainer = ref(null)
 const authStore = useAuthStore()
 
 const formatDate = computed(() => (date) => {
@@ -21,53 +21,59 @@ const formatDate = computed(() => (date) => {
     year: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-  });
-});
+  })
+})
 
 async function GetPosts() {
   try {
-    const response = await fetch(`${useDevStore().host}/report/show/${route.params.link}/`, { method: 'GET' });
-    let data = await response.json();
-    posts.value = data.data.messages;
-    reportData.value = data.data;
-    scrollToBottom();
+    const response = await fetch(`${useDevStore().host}/report/show/${route.params.link}/`, {
+      method: 'GET',
+    })
+    let data = await response.json()
+    posts.value = data.data.messages
+    reportData.value = data.data
+    scrollToBottom()
   } catch (err) {
-    console.error('Ошибка при загрузке сообщений:', err);
+    console.error('Ошибка при загрузке сообщений:', err)
   }
 }
 
 async function sendMessage() {
-  if (!messageInput.value.trim()) return;
-  sending.value = true;
-  error.value = null;
+  if (!messageInput.value.trim()) return
+  sending.value = true
+  error.value = null
 
   try {
     const response = await fetch(`${useDevStore().host}/report/send`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + authStore.token },
 
-      body: JSON.stringify({ text: messageInput.value.trim(), report_id: reportData.value.id, user_id: authStore.user_id }),
-    });
+      body: JSON.stringify({
+        text: messageInput.value.trim(),
+        report_id: reportData.value.id,
+        user_id: authStore.user_id,
+      }),
+    })
 
-    if (!response.ok) throw new Error('Ошибка отправки');
-    messageInput.value = '';
+    if (!response.ok) throw new Error('Ошибка отправки')
+    messageInput.value = ''
   } catch (err) {
-    error.value = 'Не удалось отправить сообщение';
+    error.value = 'Не удалось отправить сообщение'
   } finally {
-    sending.value = false;
+    sending.value = false
   }
 }
 
 function scrollToBottom() {
   nextTick(() => {
     if (chatContainer.value) {
-      chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+      chatContainer.value.scrollTop = chatContainer.value.scrollHeight
     }
-  });
+  })
 }
 
 onMounted(() => {
-  GetPosts();
+  GetPosts()
 
   // const pusher = new Pusher('YOUR_PUSHER_KEY', { cluster: 'YOUR_CLUSTER' });
   // const channel = pusher.subscribe(`chat-${route.params.link}`);
@@ -75,14 +81,22 @@ onMounted(() => {
   //   posts.value.push(data.message);
   //   scrollToBottom();
   // });
-});
+})
 
-watch(() => route.params.link, GetPosts);
+watch(() => route.params.link, GetPosts)
 </script>
 
 <template>
   <div class="chat-container" ref="chatContainer">
-    <div v-for="post in posts" :key="post.id" class="message" :class="{'admin-message': post.creator.role === 'Admin', 'user-message': post.creator.role !== 'Admin'}">
+    <div
+      v-for="post in posts"
+      :key="post.id"
+      class="message"
+      :class="{
+        'admin-message': post.creator.role === 'Admin',
+        'user-message': post.creator.role !== 'Admin',
+      }"
+    >
       <div class="message-avatar">
         <img v-if="post.creator.avatar" :src="post.creator.avatar.path" class="avatar" />
         <img v-else src="@/assets/users/default.png" class="avatar" />
@@ -98,10 +112,7 @@ watch(() => route.params.link, GetPosts);
   </div>
 
   <div class="new-post">
-    <textarea
-      v-model="messageInput"
-      placeholder="Напишите ваше сообщение..."
-    ></textarea>
+    <textarea v-model="messageInput" placeholder="Напишите ваше сообщение..."></textarea>
     <div class="post-actions">
       <button @click="sendMessage" :disabled="sending">Отправить</button>
       <p v-if="error" class="error">{{ error }}</p>
@@ -109,7 +120,11 @@ watch(() => route.params.link, GetPosts);
   </div>
 
   <div class="chat-input">
-    <textarea v-model="messageInput" placeholder="Введите сообщение..." @keyup.enter.exact.prevent="sendMessage"></textarea>
+    <textarea
+      v-model="messageInput"
+      placeholder="Введите сообщение..."
+      @keyup.enter.exact.prevent="sendMessage"
+    ></textarea>
     <button @click="sendMessage" :disabled="sending">Отправить</button>
     <p v-if="sending">Отправка...</p>
     <p v-if="error" class="error">{{ error }}</p>
@@ -124,7 +139,6 @@ watch(() => route.params.link, GetPosts);
   padding: 20px;
   width: 100%;
 }
-
 
 .message {
   display: flex;

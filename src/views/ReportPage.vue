@@ -43,11 +43,10 @@ async function SendReport() {
   })
 
   let responseData = await response.json()
-  if (responseData.link){
+  if (responseData.link) {
     console.log(`Link: ${responseData.link}`)
     router.push({ path: `reports/${responseData.link}` })
   }
-
 }
 </script>
 

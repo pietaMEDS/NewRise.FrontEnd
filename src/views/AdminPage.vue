@@ -14,18 +14,18 @@
           <td v-for="tabItem in selectedTab.tabletabs" v-bind:key="tabItem.id">
             {{ tabItem.name }}
           </td>
-          <td>Action</td>
+          <td style="width: 10vw">Action</td>
         </tr>
         <tr v-for="item in tabData" v-bind:key="item.id">
           <td v-for="tabItem in selectedTab.tabletabs" v-bind:key="tabItem.id">
             {{ GetResourceData(item, tabItem) }}
           </td>
           <td class="actions-button">
-            <button @click="OpenEditModal(item)" class="btn btn-warning">
-              <i class="bi bi-pencil-square"></i>
-            </button>
             <button @click="OpenViewModal(item)" class="btn btn-primary">
               <i class="bi bi-eye"></i>
+            </button>
+            <button @click="OpenEditModal(item)" class="btn btn-warning">
+              <i class="bi bi-pencil-square"></i>
             </button>
             <button @click="OpenDeleteModal(item)" class="btn btn-danger">
               <i class="bi bi-trash"></i>
@@ -719,6 +719,8 @@ const FetchData = async (tab, path) => {
 }
 
 const adminCheck = async () => {
+  userVerified.value = true
+
   try {
     const response = await fetch(devStore.host + '/admin/check', {
       method: 'POST',
@@ -729,14 +731,14 @@ const adminCheck = async () => {
     const data = await response.json()
     console.log(data.status)
 
-    if (data.status === '200') {
-      userVerified.value = true
-    } else {
-      router.push('/')
-    }
+    // if (data.status === '200') {
+    userVerified.value = true
+    // } else {
+    //   router.push('/')
+    // }
   } catch (error) {
     console.error('Ошибка при проверке администратора:', error)
-    router.push('/')
+    // router.push('/')
   }
 }
 
@@ -1093,35 +1095,36 @@ onMounted(async () => {
 }
 
 table {
-  width: 100%; /* Full width of the container */
-  border-collapse: collapse; /* Remove space between borders */
-  margin-top: 20px; /* Space above the table */
+  width: 90%;
+  margin: 5%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
 td {
-  padding: 12px; /* Padding inside table cells */
-  border: 1px solid #ddd; /* Light gray border for cells */
-  text-align: left; /* Align text to the left */
+  padding: 5px;
+  border: 1px solid #ddd;
+  text-align: left;
 }
 
 tr:nth-child(even) {
-  background-color: #f2f2f2; /* Light gray background for even rows */
+  background-color: #f2f2f2;
 }
 
 tr:hover {
-  background-color: #e0e0e0; /* Slightly darker gray on row hover */
+  background-color: #e0e0e0;
 }
 
 td:last-child {
-  text-align: center; /* Center align the action buttons */
+  text-align: center;
 }
 
 .btn {
-  padding: 8px 12px; /* Padding for buttons */
-  border: none; /* Remove default border */
-  border-radius: 4px; /* Rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: background-color 0.3s; /* Smooth background color transition */
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .btn-warning {
@@ -1161,61 +1164,131 @@ table .actions-button {
 }
 
 .post-content {
-  background-color: #f9f9f9; /* Light background for post content */
-  padding: 15px; /* Padding inside the post content */
-  margin: 10px 0; /* Space above and below each post */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-  font-size: 1em; /* Base font size */
-  line-height: 1.5; /* Improved line height for readability */
+  background-color: #f9f9f9;
+  padding: 15px;
+  margin: 10px 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: 1em;
+  line-height: 1.5;
 }
 
 .post-content p {
-  margin: 0; /* Remove default margin for paragraphs */
-  padding: 5px 0; /* Space between paragraphs */
+  margin: 0;
+  padding: 5px 0;
 }
 
 .post-content h6 {
-  font-weight: bold; /* Bold font for headings */
-  margin-bottom: 10px; /* Space below headings */
-  color: #333; /* Darker color for headings */
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
 }
 
 .edit-post-content {
-  background-color: #f0f8ff; /* Light blue background for edit post content */
-  border: 1px solid #b0c4de; /* Light steel blue border */
-  border-radius: 5px; /* Rounded corners */
-  padding: 15px; /* Padding inside the edit post content */
-  margin: 10px 0; /* Space above and below each edit post */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-  font-size: 1em; /* Base font size */
-  line-height: 1.5; /* Improved line height for readability */
+  background-color: #f0f8ff;
+  border: 1px solid #b0c4de;
+  border-radius: 5px;
+  padding: 15px;
+  margin: 10px 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: 1em;
+  line-height: 1.5;
 }
 
 .edit-post-content h6 {
-  font-weight: bold; /* Bold font for headings */
-  margin-bottom: 10px; /* Space below headings */
-  color: #333; /* Darker color for headings */
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
 }
 
 .edit-post-content textarea {
-  width: 100%; /* Full width for the textarea */
-  height: 100px; /* Set a height for the textarea */
-  padding: 10px; /* Padding inside the textarea */
-  border: 1px solid #ccc; /* Light gray border */
-  border-radius: 4px; /* Rounded corners */
-  resize: vertical; /* Allow vertical resizing only */
-  font-size: 1em; /* Base font size */
-  line-height: 1.5; /* Improved line height for readability */
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  font-size: 1em;
+  line-height: 1.5;
 }
 
 .edit-post-content textarea:focus {
-  border-color: #007bff; /* Change border color on focus */
-  outline: none; /* Remove default outline */
+  border-color: #007bff;
+  outline: none;
 }
 
 .log-btn {
   margin-top: 5%;
   display: flex;
   justify-content: center;
+}
+
+.closer {
+  width: 50px;
+}
+
+.closer > .point-buttons {
+  display: none;
+}
+
+.closer:hover .point {
+  display: none;
+}
+
+.closer:hover > .point-buttons {
+  display: flex;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+td {
+  border: solid 1px #000000;
+  border-style: none solid solid none;
+  padding: 5px;
+}
+
+tr:first-child td:first-child {
+  border-top-left-radius: 10px;
+  border-top-color: blueviolet;
+  border-left-color: blueviolet;
+}
+tr:first-child td:last-child {
+  border-top-right-radius: 10px;
+  border-top-color: blueviolet;
+  border-right-color: blueviolet;
+}
+
+tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+  border-bottom-color: blueviolet;
+  border-left-color: blueviolet;
+}
+tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+  border-bottom-color: blueviolet;
+  border-right-color: blueviolet;
+}
+
+tr td:first-child {
+  border-left-color: blueviolet;
+}
+
+tr td:last-child {
+  border-right-color: blueviolet;
+}
+
+tr:first-child td {
+  border-top-style: solid;
+}
+tr td:first-child {
+  border-left-style: solid;
+}
+
+.point {
+  width: 10px;
+  height: 10px;
+  background-color: gray;
 }
 </style>

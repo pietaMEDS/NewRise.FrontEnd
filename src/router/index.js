@@ -78,14 +78,10 @@ const router = createRouter({
       // component: () => import('../views/CF_CUXUI_results.vue'),
     },
 
-
-
-
-
     {
       path: '/:pathMatch(.*)*',
       redirect: '/404',
-    }
+    },
   ],
 })
 

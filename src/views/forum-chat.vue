@@ -39,7 +39,7 @@
                   >
                     Изменить
                   </button>
-                  {{post.id}}
+                  {{ post.id }}
                   <button
                     v-if="post.creator.id == currentUserId || userVerified"
                     class="action-btn delete"
@@ -300,7 +300,10 @@ const createPost = async () => {
     newPost.value = ''
     ReplyPost.value = ''
   } catch (error) {
-    notificationStore.addNotification({ type: 'Error', message: 'При отправки сообщения произошла ошибка' })
+    notificationStore.addNotification({
+      type: 'Error',
+      message: 'При отправки сообщения произошла ошибка',
+    })
     console.error('Ошибка при создании поста:', error)
   }
 }

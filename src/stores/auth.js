@@ -40,9 +40,9 @@ export const useAuthStore = defineStore('auth', {
     },
 
     setFingerprints(fingerprints) {
-      this.fingerprint = fingerprints.main;
-      this.c_fingerprint = fingerprints.custom;
-    }
+      this.fingerprint = fingerprints.main
+      this.c_fingerprint = fingerprints.custom
+    },
   },
 
   // Optionally initialize token from localStorage

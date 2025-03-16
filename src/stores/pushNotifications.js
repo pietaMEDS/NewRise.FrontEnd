@@ -21,6 +21,6 @@ export const useNotificationsStore = defineStore('NotificationsFunction', {
 
     ConfirmNotificationState() {
       this.NotificationsStateUpdate = false
-    }
+    },
   },
 })

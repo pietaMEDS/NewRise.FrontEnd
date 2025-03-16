@@ -67,9 +67,8 @@ onBeforeUnmount(() => {
 
 console.log(`FingerPrint: ${client.getFingerprint()}`)
 console.log(`Custom FingerPrint: ${client.getCustomFingerprint()}`)
-console.log(`Browser Data: ${client.getBrowserData().ua }`)
+console.log(`Browser Data: ${client.getBrowserData().ua}`)
 console.log(client.getBrowserData())
-
 
 if (authStore.isAuthenticated()) {
   connectNotifySocket = () => {
